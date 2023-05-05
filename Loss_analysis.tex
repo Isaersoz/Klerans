@@ -1,0 +1,80 @@
+\section{Loss Analysis}
+In this section the losses of the isolated SEPIC converter design, are calculated. For the calculations, steady state operation and below operation conditions are utilized. Losses on the MOSFET, diode, transformer and the input inductor are calculated. Summing up the below calculations, we have a total loss of  4.74 W. Also note that switching losses (gate opening and closing) are ignored compared to other losses.
+
+\begin{table}[H]
+    \centering
+    \caption{Operating Conditions for Loss Calculation.}
+    \label{tab:los_conditions}
+    \begin{tabular}{|c|c|}
+        \hline
+        Switching Frequency:        & 50 kHz    \\
+        \hline
+        Duty Cycle:                 & 0.5       \\
+        \hline
+        Input Voltage:              & 16 V      \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsection{MOSFET Conduction Losses}
+\begin{equation}
+    P_{MOS} = I^2R_{ds,on}D = 8^2\times25\times10^{-3}\times0.5 = 0.8 W
+\end{equation}
+
+\subsection{Diode Conduction Losses}
+\begin{equation}
+    P_{diode} = I_oV_f(1-D) = 2.25\times0.88\times0.5 = 1 W
+\end{equation}
+
+\subsection{Transformer Core and Conduction Losses}
+Since we are working in CCM with a switching frequency $f_{sw}=50 kHz$, we have a core loss at most the quarter of the loss indicated in the datasheet \cite{web:ferrite_cores}.
+
+\begin{equation}
+    P_{core,tr} = \frac{1}{4}\times6 = 1.5 W
+\end{equation}
+
+For the conduction losses on the transformer, the average currents for (1-D) period is calculated from the simulation results.
+
+\begin{equation}
+    I_{s,avg} = 2.25 A
+\end{equation}
+\begin{equation}
+    I_{p,avg} = 2.25\times3.2 = 7.2 A
+\end{equation}
+\begin{equation}
+    P_{cond,tr} = P_{primary} + P_{secondary} = (I^2_{p,avg}\times R_p + I^2_{s,avg}\times R_s)(1-D)
+\end{equation}
+\begin{equation}
+    P_{cond,tr} = 0.3 W
+\end{equation}
+
+\subsection{Inductor Core and Conduction Losses}
+Looking at the toroid core datasheet, we have a $750mW/cm^3$ for 100 kHz and the core volume is 5.34 $cm^3$, giving 4 W for this core. Again we can assume quarter of this loss as a core loss since we work with 50 kHz and CCM.
+\begin{equation}
+    P_{core,ind} = 1 W
+\end{equation}
+\begin{equation}
+    P_{cond,ind} = I^2_{in,avg}ESR_{ind} = 0.14 W
+\end{equation}
+
+\subsection{Efficiency Calculation for Different Load Cases}
+Above calculations are done for the 100\% loading case where the output current is 1 A. For the 75\%,50\% and 25\% loading cases, we can calculate the losses easily since the all the current averages will be the respective percentages of the loading cases. Therefore conduction ($I^2R$) losses will change by the square of the loading whereas the core losses will change by the loading percentage. Diode losses also will change by the loading percentage. Resulting efficiency table shows the results.
+
+\begin{table}[H]
+    \centering
+    \caption{Efficiency results of different cases.}
+    \label{tab:eff}
+    \begin{tabular}{|c|c|c|c|}
+        \hline
+        Loading percentage  & $P_{loss}$    & $P_{out}$ & Efficiency    \\
+        \hline\hline
+        100\%               & 4.74 W        & 48 W      & 91.01\%       \\
+        \hline
+        75\%                & 3.32 W        & 36 W      & 91.55\%       \\
+        \hline
+        50\%                & 2.06 W        & 24 W      & 92.1\%        \\
+        \hline
+        25\%                & 0.95 W        & 12 W      & 92.66\%       \\
+        \hline
+    \end{tabular}
+\end{table}

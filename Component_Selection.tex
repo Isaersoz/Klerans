@@ -1,0 +1,189 @@
+\section{Component Selection}
+Other components of the isolated SEPIC converter is selected as given below. Considering the requirements of the topology and safety measures, we have selected potential candidates for the components.
+
+\subsection{Controller Selection}
+For the duty cycle calculation against the variation in input and output sides, and therefore gathering the current and voltage measurements from the sensors, we have decided our controller to be a digital one and we have selected the STM32-Nucleo-F334R8 board. Related information about the controller is given in Table \ref{tab:controller}.
+
+\begin{table}[H]
+    \centering
+    \caption{STM32-Nucleo-F334R8 board information.}
+    \label{tab:controller}
+    \begin{tabular}{|c|c|}
+        \hline
+        Supply voltage:         & 5 V / 7-12 V   \\
+        \hline
+        Max. CPU frequency:     & 72 MHz        \\
+        \hline
+        Dimensions in mm:       & 70x82.5       \\
+        \hline
+        Cost:                   & 330 TL        \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsection{Sensors}
+In order to adjust the duty cycle to compensate the changes in input and outputs of the converter, we should monitor the input and output voltages continuously. For this purpose we have selected an isolated Delta-Sigma modulator product for our voltage measurements. Its specifications are given in below Table \ref{tab:AMC}. This product gives separates input from the output via capacitive double isolation barrier. The device can also be used for current measurements. Additional shunt resistances are not mentioned in this section.
+
+\begin{table}[H]
+    \centering
+    \caption{Isolated Delta-Sigma Modulator Specifications.\cite{web:AMC}}
+    \label{tab:AMC}
+    \begin{tabular}{|c|c|}
+        \hline
+        Part no:                & AMC1306M25DWVR    \\
+        \hline
+        Sampling rate:          & 78k/s             \\
+        \hline
+        Isolation strength:     & 7000 V            \\
+        \hline
+        Cost:                   & 143.5 TL          \\
+        \hline
+    \end{tabular}
+\end{table}
+
+
+\subsection{Switching Components}
+Looking at the topology as given in Figure \ref{fig:iso_sepic}, we have two switching components which are the MOSFET at the primary side and the diode at the secondary side of the transformer. Looking at the simulation results in Section \ref{comp_simulation}, we have selected our switching components with the addition of safety factors. For the MOSFETs, we decided to parallel two MOSFET to decrease to losses due to $R_{ds,on}$.
+
+\begin{table}[H]
+    \centering
+    \caption{MOSFET Specifications.\cite{web:mosfet}, will be paralleled.}
+    \label{tab:mosfet}
+    \begin{tabular}{|c|c|}
+        \hline
+        Part no:            &  RSS070N05FRA     \\
+        \hline
+        $V_{ds}$            &  45 V             \\
+        \hline
+        $I_d$               &  7 A              \\
+        \hline
+        $R_{ds,on}$         & 25 $m\Omega$      \\
+        \hline
+        Total gate charge:  & 12 nC             \\
+        \hline
+        Cost:               & 15.2 TL           \\
+        \hline
+    \end{tabular} 
+\end{table}
+
+To drive these MOSFETS properly, we have selected an isolated gate driver with specifications below in Table \ref{tab:gate_driver}.
+
+\begin{table}[H]
+    \centering
+    \caption{Gate Driver Product Specifications.\cite{web:gate_driver}}
+    \label{tab:gate_driver}
+    \begin{tabular}{|c|c|}
+         \hline
+         Part no:               & UCC23313BDWYR     \\
+         \hline
+         Current output peak:   & 5.3 A             \\
+         \hline
+         Output supply:         & 14-33 V           \\
+         \hline
+         Cost:                  & 33.1 TL           \\
+         \hline
+    \end{tabular}
+\end{table}
+
+For the diode, we have selected the following Schottky diode product for our design as given below. Again we are not limited to this product, we can select another Schottky diode with similar ratings for our design if this one is not available during the implementation.
+
+\begin{table}[H]
+    \centering
+    \caption{Schottky Diode Specifications.\cite{web:diode}}
+    \label{tab:diode}
+    \begin{tabular}{|c|c|}
+        \hline
+        Part no:            & VSSAF512          \\
+        \hline
+        $V_r$               & 12 V              \\
+        \hline
+        $I_f$               & 5 A               \\
+        \hline
+        $V_{f,max}$         & 0.88 V            \\
+        \hline
+        Cost:               & 7.6 TL            \\
+        \hline
+    \end{tabular}
+\end{table}
+
+
+\subsection{Inductor Core Selection}
+For the inductor at the input side, in order not to saturate the core and obtain the desired inductance value, we have selected a Kool Mu core with its specifications below. Again we will be looking for alternative cores for our inductor design, considering our available space and limitations.
+
+\begin{table}[H]
+    \centering
+    \caption{Inductor Toroid core specifications.\cite{web:tor_core}}
+    \label{tab:toroid_core}
+    \begin{tabular}{|c|c|}
+        \hline
+        Part no:            & 0077548A7         \\
+        \hline
+        Core material:      & Kool Mu           \\
+        \hline
+        Permeability:       & 125               \\
+        \hline
+        Inductance Ratio:   & 127 $nH/T^2$      \\
+        \hline
+        Dimensions in mm:   & 33x33x11          \\
+        \hline
+        Cost:               & 52 TL             \\
+        \hline
+    \end{tabular}
+\end{table}
+
+If we select and wind this core with $N=16$ turns to get a $32.6\mu H$ inductor with AWG26 wire with the same paralleling configuration for the primary side, we get the ESR of the inductance as given below. Using the core dimensions, an estimate length for each winding is calculated as 48 mm.
+
+\begin{equation}
+    ESR_{L}=\frac{48 mm\times16\times133 m\Omega/m\times10^{-3}m/mm}{12}=8.6 m\Omega
+\end{equation}
+
+\subsection{Capacitor Selection}
+Selecting the input capacitor, we desired a large enough capacitor with enough current rating. We have decided on paralleling three of the Aluminum capacitor with given parameters in Table \ref{tab:input_cap}. Since we are paralleling the capacitors, if the component will not be available, we can select smaller capacitance with similar ratings but this will result in higher volumes of the converter.
+
+\begin{table}[H]
+    \centering
+    \caption{Input Capacitor Specification.\cite{web:input_cap}}
+    \label{tab:input_cap}
+    \begin{tabular}{|c|c|}
+        \hline
+        Part no:        & KR3-035V332MJ250  \\
+        \hline
+        Capacitance:    & 3300 $\mu F$      \\
+        \hline
+        Rated voltage:  & 35 $V$             \\
+        \hline
+        Ripple current: & 1960 $mA$         \\
+        \hline
+        Dimensions in mm & 16x16x25          \\
+        \hline
+        ESR:            & not specified     \\
+        \hline
+        Cost:           & 11 TL             \\
+        \hline
+    \end{tabular}
+\end{table}
+
+For the output capacitor, since the output voltage ripple is desired to be very low, we agreed on putting a 1 mF capacitor to the output side. Parameters of the candidate capacitor is given below. We are not limited to using this capacitor, we can select another one with similar ratings in case of unavailability.
+
+\begin{table}[H]
+    \centering
+    \caption{Output Capacitor Specification.\cite{web:output_cap}}
+    \label{tab:output_Cap}
+    \begin{tabular}{|c|c|}
+        \hline
+        Part no:        & KLH-100V102MK400  \\
+        \hline
+        Capacitance:    & 1000 $\mu F$      \\
+        \hline
+        Rated Voltage:  & 100 V             \\
+        \hline
+        Ripple current: & 2500 $mA$         \\
+        \hline
+        ESR:            & 76 $m\Omega$      \\
+        \hline
+        Dimensions(mm)  & 18x18x40          \\
+        \hline
+        Cost:           & 23.3 TL           \\
+        \hline
+    \end{tabular}
+\end{table}

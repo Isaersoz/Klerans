@@ -1,0 +1,55 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[pdftex]{graphicx}
+\usepackage{url} 
+\usepackage[bookmarks, colorlinks=false, pdfborder={0 0 0}, pdftitle={<pdf title here>}, pdfauthor={<author's name here>}, pdfsubject={<subject here>}, pdfkeywords={<keywords here>}]{hyperref} 
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{multicol}
+\usepackage[section]{placeins}
+\usepackage{amsmath}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{ragged2e}
+
+% Paper margins etc.
+\usepackage{geometry}
+ \geometry{
+ a4paper,
+ total={170mm,257mm},
+ left=20mm,
+ top=20mm
+ }
+
+\begin{document}
+
+\input{Title_page}
+
+\pagenumbering{arabic}
+
+\tableofcontents
+
+\listoffigures
+\listoftables
+
+\newpage
+\input{Introduction.tex}
+
+\input{Topology_Selection}
+
+\input{Magnetic_Design}
+
+\input{Computer_Simulations}
+
+\input{Component_Selection}
+
+\input{Loss_analysis}
+
+\newpage
+\input{Conclusion.tex}
+
+\newpage
+\bibliographystyle{IEEEtran}
+\bibliography{ref.bib}
+
+\end{document}

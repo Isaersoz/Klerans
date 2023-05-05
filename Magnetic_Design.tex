@@ -1,0 +1,209 @@
+\section{Magnetic Design}
+
+\subsection{Wire Selection}
+To select the proper wires for transformer windings and inductor coil, we considered the average ratings of input and output currents. Also the skin effect ()is taken into account. Therefore looking at the AWG table (BURAYA REF) , we have selected the 26AWG. Parameters of the cable are given in Table \ref{tab:AWG26} 
+
+\begin{table}[H]
+    \centering
+    \caption{AWG26 cupper conductor parameters.(REF)}
+    \label{tab:AWG26}
+    \begin{tabular}{|c|c|}
+        \hline
+        Max. Amp rate:                          & 0.361 $A$   \\
+        \hline
+        Conductor diameter:                     & 0.4 $mm$    \\
+        \hline
+        Conductor cross-section area:           & 0.128 $mm^2$\\
+        \hline
+        Max. frequency for 100\% skin depth:    & 107 $kHz$   \\
+        \hline
+    \end{tabular}   
+\end{table}
+
+Since its Amp. rate is very low but it gives 100\% skin depth, we can parallel this wire for our primary and secondary windings. Considering the worst case scenario of 12 V input (giving 4 A input current), and accounting for the 10\% losses on the design, we can assume that input current will be around 4.4 A. For the output side it is assumed to be around 1 A output current for 48 W output power.
+
+\begin{table}[H]
+    \centering
+    \caption{Transformer Wiring Configuration.}
+    \label{tab:tr_wiring}
+    \begin{tabular}{|c|c|c|}
+        \hline
+        Transformer side            & Assumed Current level & \# of parallel wires   \\
+        \hline\hline
+        Primary                     & 4.4 A                 & 12                    \\
+        \hline
+        Secondary                   & 1 A                   & 3                     \\
+        \hline
+    \end{tabular}
+\end{table}
+
+
+\subsection{Core Selection}
+We first decided on core geometry considering the recommendations from Ferrite Core Catalog by the Magnetics \cite{web:ferrite_cores}. As the winding of the transformer is a topic that we are not very familiar of, we filtered our geometries to the ones that have a cylindrical winding surface to simplify the process. ETD core shape seemed to be best fit for our application and it is recommended for transformers by the catalog. \\
+After doing some market research, we quickly realized that only ferrite cores are available to purchase in Turkey. Therefore, we decided to base our design for a ferrite core; so that we can quickly purchase a new core in case of an emergency. Ferrite cores also have a linear B-H characteristics until they are saturated, which simplifies the design process. \\
+Considering the area that the windings occupy we have chosen ETD39 sized core to stay below a fill factor of 0.3.
+\subsection{Transformer Design}
+As the voltage transfer ratio has a $\frac{D}{1-D}$ dependence, we needed to fix our duty cycle range around 0.5 for a safe operation. Therefore, we decided on a duty cycle range of 0.4 $<$ D $<$ 0.6. We also chose $f_{sw}=50$kHz as we not only believe it is a sweet-spot for the choice of switching frequency but also provides some margin for an increase in frequency until skin effect is observed at the wires. This margin may become useful during the implementation as real-world effects may lead us to increase the switching frequency.  \\
+We can calculate the required turns ratio for the extremities of the duty cycle and the input voltage as
+\begin{equation*} \medskip \\
+    \frac{48}{12} = \frac{N_2}{N_1} \frac{0.6}{1-0.6}
+\end{equation*}
+\begin{equation*} \medskip \\
+    \frac{N_2}{N_1} = 2.67
+\end{equation*}
+\begin{equation*} \medskip \\
+    \frac{48}{18} = \frac{N_2}{N_1} \frac{0.4}{1-0.4}
+\end{equation*}
+\begin{equation*} \medskip \\
+    \frac{N_2}{N_1} = 1.78
+\end{equation*}
+As there will be some losses as well, choosing a turns ratio a little over the larger result would ensure the operation stays at 0.4 $<$ D $<$ 0.6. We chose our turns ratio to be 3.2 (i.e. 5:16), around 1.2 times the calculated turns ratio. Furthermore, we also assumed $\Delta i_{L_m} = 2i_{L_m,avg} = 8$A, to find the minimum inductance required for CCM operation. \\
+We can write the inductor charging and discharging equations for 12V input (worst case), assuming ideal components and without explicitly stating duty cycles as
+\begin{equation*}
+    V_s D T_s = L_m \Delta i_{L_m}
+\end{equation*}
+\begin{equation*}
+    D = \frac{L_m \Delta i_{L_m} f_{sw}}{V_s}
+\end{equation*}
+\begin{equation*}
+    D = \frac{L_m \times 8 \times 50k}{12}
+\end{equation*}
+\begin{equation} \bigskip \\
+    D = 33333.33 \; L_m
+\end{equation}
+\begin{equation*}
+    \frac{V_o (1-D) T_s N_1}{N_2} = L_m \Delta i_{L_m}
+\end{equation*}
+\begin{equation*}
+    1-D = \frac{L_m \Delta i_{L_m} f_{sw} N_2}{V_o N_1}
+\end{equation*}
+\begin{equation*}
+    1-D = \frac{L_m \times 8 \times 50k \times 3.2}{48}
+\end{equation*}
+\begin{equation} \medskip \\
+    1-D = 26666.67 \; L_m
+\end{equation}
+Adding equations (1) and (2) we get
+\begin{equation*} \medskip \\
+    1 = 60000 \; L_m
+\end{equation*}
+\begin{equation*} \medskip \\
+    L_m = 16.67 \; \mu H
+\end{equation*}
+for CCM-DCM border operation. \\
+We multiplied this number by 1.5 so that we are guaranteed to operate at CCM. Thus, $L_m = 25 \; \mu H$ can be stated as the absolute minimum inductance required. At this stage the core choice must be finalized in order to continue the design. \\
+To select a suitable core we must either fix the operating flux density and find the primary number of turns or fix the number of turns and make sure that core does not saturate. We chose the second option and fixed the number of turns for the transformer as
+\begin{equation*}
+    N_p = 10, \; N_s = 32
+\end{equation*}
+Then we can calculate the total area the wires will occupy as
+\begin{equation*}
+    A_{wire} =  0.128 mm^2 \times [(12\times10)+(32\times3)] = 27.65 mm^2
+\end{equation*}
+Taking fill factor into account, we determined that both ETD34 and ETD39 sized cores are suitable for hand-winding. Core suppliers produce fixed various gapped versions of the cores as well as their inductance factors and effective permeabilities given in the datasheet for each version. The purpose behind this methodology was to avoid using a custom determined gap, which would be time consuming to implement accurately.\\
+We quickly calculated the operating points for several different gap values and came up with a possible configuration for each size. \medskip \\
+$\bullet$ ETD34 Core, g = 0.2mm, $A_L$ = 482 $nH/T^2$, $\mu_e$ = 310, $l_e$ = 78.6mm
+\begin{equation*}
+    L_m = A_L \times N_p^2 = 482n \times 100 = 48.2 \mu H
+\end{equation*}
+Similar derivation with equations (1) and (2)
+\begin{equation*}
+    D = \frac{L_m \Delta i_{L_m} f_{sw}}{V_s}
+\end{equation*}
+\begin{equation*}
+    D = \frac{48.2\mu \times \Delta i_{L_m} \times 50k}{12}
+\end{equation*}
+\begin{equation}
+    D = 0.2 \; \Delta i_{L_m}
+\end{equation}
+\begin{equation*}
+    1-D = \frac{L_m \Delta i_{L_m} f_{sw} N_2}{V_o N_1}
+\end{equation*}
+\begin{equation*}
+    1-D = \frac{48.2\mu \times \Delta i_{L_m} \times 50k \times 3.2}{48}
+\end{equation*}
+\begin{equation}  \\
+    1-D = 0.16 \; \Delta i_{L_m}
+\end{equation}
+Adding equations (3) and (4) we get
+\begin{equation*}  \\
+    1 = 0.36 \; \Delta i_{L_m}
+\end{equation*}
+\begin{equation*}  \\
+    \Delta i_{L_m} = 2.78 \; A
+\end{equation*}
+Then the maximum current can be found as
+\begin{equation*}
+    i_{L_m,max} = i_{L_m,avg} \times 1.1 + \Delta i_{L_m}/2 = 4 \times 1.1 + 1.4 = 5.8 \; A
+\end{equation*}
+where 1.1 multiplier is used as a safety margin. Using this result and applying Ampere's Law we can find the operating magnetic field of the core as
+\begin{equation*}
+    H \times l_e = N_p \times i_{L_m,max}
+\end{equation*}
+\begin{equation*}
+    H = \frac{10 \times 5.8}{78.6 \times 10^{-3}} = 700 \; A/m
+\end{equation*}
+The magnetic flux density for this operating point can be found as
+\begin{equation*}
+    B = \mu_e H = 310 \times 4\pi \times 10^{-7} \times 700 = 0.272 \; T
+\end{equation*}
+
+$\bullet$ ETD39 Core, g = 0.5mm, $A_L$ = 326 $nH/T^2$, $\mu_e$ = 191, $l_e$ = 92.2mm
+\begin{equation*}
+    L_m = A_L \times N_p^2 = 326n \times 100 = 32.6 \mu H
+\end{equation*}
+Similar derivation with equations (1) and (2)
+\begin{equation*}
+    D = \frac{L_m \Delta i_{L_m} f_{sw}}{V_s}
+\end{equation*}
+\begin{equation*}
+    D = \frac{32.6\mu \times \Delta i_{L_m} \times 50k}{12}
+\end{equation*}
+\begin{equation}
+    D = 0.136 \; \Delta i_{L_m}
+\end{equation}
+\begin{equation*}
+    1-D = \frac{L_m \Delta i_{L_m} f_{sw} N_2}{V_o N_1}
+\end{equation*}
+\begin{equation*}
+    1-D = \frac{32.6\mu \times \Delta i_{L_m} \times 50k \times 3.2}{48}
+\end{equation*}
+\begin{equation}  \\
+    1-D = 0.109 \; \Delta i_{L_m}
+\end{equation}
+Adding equations (5) and (6) we get
+\begin{equation*}  \\
+    1 = 0.245 \; \Delta i_{L_m}
+\end{equation*}
+\begin{equation*}  \\
+    \Delta i_{L_m} = 4.08 \; A
+\end{equation*}
+Then the maximum current can be found as
+\begin{equation*}
+    i_{L_m,max} = i_{L_m,avg} \times 1.1 + \Delta i_{L_m}/2 = 4 \times 1.1 + 2.1 = 6.5 \; A
+\end{equation*}
+where 1.1 multiplier is used as a safety margin. Using this result and applying Ampere's Law we can find the operating magnetic field of the core as
+\begin{equation*}
+    H \times l_e = N_p \times i_{L_m,max}
+\end{equation*}
+\begin{equation*}
+    H = \frac{10 \times 6.5}{92.2 \times 10^{-3}} = 705 \; A/m
+\end{equation*}
+The magnetic flux density for this operating point can be found as
+\begin{equation*}
+    B = \mu_e H = 191 \times 4\pi \times 10^{-7} \times 705 = 0.17 \; T
+\end{equation*}
+Both of the options suit the operation; however, ETD34 core option is very close to its saturation point. Hence, it can be risky to use that design for our project. We will use for the bigger core with the consequence of having high magnetic losses. \smallskip \\
+Calculating the fill factor for the selected ETD39 core we get 
+\begin{equation*}
+    FF = \frac{A_{wire}}{A_e} = \frac{27.65 \; mm^2}{125 \; mm^2} = 0.22
+\end{equation*}
+Minimum transformer average current before the converter starts operating in DCM can be stated as
+\begin{equation*}
+    i_{L_m,avg,min} = \Delta i_{L_m}/2 = 2.04 \; A 
+\end{equation*}
+Therefore the minimum average load current can be found reflecting this value to the secondary side with the turns ratio as
+\begin{equation*}
+    i_{o,avg,min} = i_{L_m,avg,min}/3.2 = 2.04/3.2 = 0.6375 \; A 
+\end{equation*}
+The minimum transformer current at the CCM-DCM border is 0V as expected, whereas the maximum transformer current is equal to ripple current; which is 4.08A (ignoring current direction).
